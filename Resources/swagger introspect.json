@@ -1,0 +1,203 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Introspection API",
+    "version": "1.0",
+    "description": "Query the list of entities and permissions sets associated with the key used to invoke this API\n\n# Authentication\n\n<!-- ReDoc-Inject: <security-definitions> -->"
+  },
+  "servers": [
+    {
+      "url": "https://api.eroad.co.nz"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/introspect": {
+      "get": {
+        "operationId": "introspect",
+        "responses": {
+          "default": {
+            "description": "A list of entities and permission sets associated with the key used to invoke this API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntrospectionResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EntityType": {
+        "type": "string",
+        "enum": [
+          "machine",
+          "driver",
+          "fleet",
+          "geofence"
+        ]
+      },
+      "Metadata": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "FleetMetadata": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Metadata"
+          }
+        ]
+      },
+      "MachineMetadata": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Metadata"
+          }
+        ],
+        "properties": {
+          "registrationPlate": {
+            "type": "string"
+          },
+          "vin": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          }
+        }
+      },
+      "GeofenceMetadata": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Metadata"
+          }
+        ]
+      },
+      "DriverMetadata": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Metadata"
+          }
+        ],
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          }
+        }
+      },
+      "Permission": {
+        "required": [
+          "actions",
+          "productId",
+          "productName",
+          "entityType",
+          "entityId"
+        ],
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "read",
+                "write"
+              ]
+            }
+          },
+          "productId": {
+            "type": "string"
+          },
+          "productName": {
+            "type": "string"
+          },
+          "entityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "entityType": {
+            "$ref": "#/components/schemas/EntityType"
+          }
+        }
+      },
+      "Entity": {
+        "type": "object",
+        "properties": {
+          "entityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "entityType": {
+            "$ref": "#/components/schemas/EntityType"
+          },
+          "metadata": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/FleetMetadata"
+              },
+              {
+                "$ref": "#/components/schemas/DriverMetadata"
+              },
+              {
+                "$ref": "#/components/schemas/MachineMetadata"
+              },
+              {
+                "$ref": "#/components/schemas/GeofenceMetadata"
+              }
+            ]
+          }
+        }
+      },
+      "IntrospectionResult": {
+        "type": "object",
+        "properties": {
+          "organisationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          },
+          "entities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Entity"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "name": "eroad-api-key",
+        "in": "header"
+      }
+    }
+  }
+}

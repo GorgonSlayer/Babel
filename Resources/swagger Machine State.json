@@ -1,0 +1,200 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Latest Machine State",
+    "description": "Retrieve the latest machine state for a given machine.\n\n# Authentication\n\n<!-- ReDoc-Inject: <security-definitions> -->",
+    "version": "1.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.eroad.co.nz/machine"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/org/{orgId}/machine/{machineId}/state": {
+      "get": {
+        "operationId": "getLatestMachineState",
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "machineId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "default response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiLatestMachineState"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Location": {
+        "type": "object",
+        "properties": {
+          "gpsAccuracy": {
+            "type": "integer",
+            "description": "Max uncertainty in meters of GPS location (due to poor GPS)"
+          },
+          "bearing": {
+            "type": "integer",
+            "description": "Direction/bearing of the machine."
+          },
+          "latitude": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "longitude": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "readableLocation": {
+            "type": "string",
+            "description": "Reverse geocoded human readable location."
+          },
+          "speed": {
+            "type": "integer",
+            "description": "Machine speed in kmph."
+          },
+          "offroad": {
+            "type": "boolean",
+            "description": "Whether the machine is currently offroad or not."
+          },
+          "nearCity": {
+            "type": "boolean",
+            "description": "Whether the machine is currently near city or not."
+          }
+        }
+      },
+      "Driver": {
+        "type": "object",
+        "properties": {
+          "lastDriverId": {
+            "type": "string"
+          },
+          "loggedIn": {
+            "type": "boolean"
+          },
+          "loginTime": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Device": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID of device that is connected to machine"
+          },
+          "cellSignalStrength": {
+            "type": "integer"
+          },
+          "warnings": {
+            "type": "array",
+            "description": "An array of all the possible EHubo Statuses that are associated with a Machine, If empty array then there are no ehubo statuses and hence can be displayed as \"OK\"",
+            "items": {
+              "type": "string"
+            }
+          },
+          "odometer": {
+            "type": "number",
+            "description": "Current device odometer in KM reading.",
+            "format": "decimal"
+          }
+        }
+      },
+      "ApiLatestMachineState": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Whether the machine ignition is turned on, off or the tracking device is disconnected."
+          },
+          "privateModeActive": {
+            "type": "boolean",
+            "description": "when this is true means the vehicle is in private mode, vice versa"
+          },
+          "machineId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "organisationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventType": {
+            "type": "string",
+            "description": "Type of event"
+          },
+          "eventTime": {
+            "type": "string",
+            "description": "Timestamp when the last event was received in UTC (ISO-8601).",
+            "format": "date-time"
+          },
+          "eventSequenceNumber": {
+            "type": "string",
+            "description": "Will be greater than previous event",
+            "format": "integer"
+          },
+          "synchronizedOdometer": {
+            "type": "number",
+            "description": "Last synchronized Odometer in KM reading",
+            "format": "decimal"
+          },
+          "eventSource": {
+            "type": "string",
+            "description": "The source of this state information. Either 'ebox' or 'satellite'."
+          },
+          "driver": {
+            "$ref": "#/components/schemas/Driver"
+          },
+          "device": {
+            "$ref": "#/components/schemas/Device"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Location"
+          }
+        },
+        "description": "Attributes describing the latest state of the machine derived from events generated by Ehubo installed."
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "name": "eroad-api-key",
+        "in": "header"
+      }
+    }
+  }
+}
