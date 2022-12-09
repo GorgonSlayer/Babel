@@ -2,15 +2,15 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"radiola.co.nz/babel/src/intake"
 	"radiola.co.nz/babel/src/outtake"
 	"radiola.co.nz/babel/src/service"
-	"radiola.co.nz/babel/src/util"
 )
 
 /** Main loop for this application**/
 func main() {
-	client := util.GenerateHTTPClient()                                                                                                                                                                                                                                                                                                                                                                  //Client Pointer
+	client := &http.Client{}                                                                                                                                                                                                                                                                                                                                                                             //Client Pointer
 	fleetPinKey := "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2MzRlMTc5YWQ5MTIzMjAwMDkyZTM3NGYiLCJvcmciOiJUSe-_vVx1MDAwNlx1MDAxNO-_ve-_ve-_vSrvv73vv71TIiwidiI6MCwiZmlyc3ROYW1lIjoiQVBJICIsImxhc3ROYW1lIjoiVXNlcjIiLCJlbWFpbCI6ImFwaXVzZXIyQGVtYWlsLmNvbSIsImlhdCI6MTY2NjA2MjMwMSwiYXVkIjoiZmxlZXRwaW4uY28ubnoiLCJpc3MiOiJhcHAuZmxlZXRwaW4uY28ubnoifQ.YtTeSvCPOzyRrzXZgsXZOd78hbRm1X4Iofx_f8_m-mU" //Our FleetPin Key
 	//Intake
 	fp := intake.NewFleetPinAPIWorker(fleetPinKey)                             //Generate our JWT
@@ -30,7 +30,7 @@ func main() {
 	//Outtake
 	out := outtake.NewTransitClockOuttake("bop-api-dev.dynamis.live", 1234, "444b7db1", "bayofplenty")
 	req, err := out.GenerateTransitClockRequest()
-	out.GenerateParamURL(req, tce)
+	out.GenerateURLParams(req, tce)
 	if err != nil {
 		fmt.Println("Broke at the Marshalling phase of Transit Clock.")
 		fmt.Println(err.Error())

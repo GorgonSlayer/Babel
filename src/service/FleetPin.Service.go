@@ -31,13 +31,13 @@ func (fps FleetPinService) FleetPinAssetConstructor(res *http.Response) (intake.
 		decoder := json.NewDecoder(res.Body)
 		err := decoder.Decode(&asset)
 		if err != nil {
-			fmt.Println("Error during Decode")
+			fmt.Println("Error during Decoding from JSON to FleetPinAsset")
 			fmt.Println(err.Error())
 		}
-		fmt.Printf("\n%+#v\n", asset)
+		//fmt.Printf("\n%+#v\n", asset)
 		return asset, nil
 	}
-	return asset, errors.New("intakeResponse struct received has status code other than 200")
+	return asset, errors.New("intake response received has status code other than 200")
 }
 
 // FleetPinAssetToTransitClockFormatConverter /** This function converts the FleetPinAsset struct into a transit clock friendly format. **/

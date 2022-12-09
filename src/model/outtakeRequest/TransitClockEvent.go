@@ -11,3 +11,8 @@ type TransitClockEvent struct {
 	Door      int64   `json:"door"`     //Assumption is the door is either closed or open, we do not factor in whether it is partially open or fully closed etc.
 	DriverId  string  `json:"driverId"` //This is usually an int but can be a string
 }
+
+type TransitClockResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
