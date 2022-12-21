@@ -1,7 +1,9 @@
 package intake
 
 import (
+	"go.uber.org/zap"
 	"net/http"
+	"radiola.co.nz/babel/src/util/logger"
 	"strings"
 )
 
@@ -17,42 +19,49 @@ type IFleetPinIntakeAPI interface {
 }
 
 // FleetPinAPIKey /** FleetPin key in its original format. **/
-type fleetPinAPIKey struct {
-	jwtToken string //Environmental variable API key
+type FleetPinAPIKey struct {
+	JwtToken  string //Environmental variable API key
+	UrlString string //"https://app.fleetpin.co.nz/api/assets"
+	logger    logger.Logger
 }
 
 // NewFleetPinAPIWorker /** Generates our JWT token, needs to be formatted as "JWT /apikey/" **/
-func NewFleetPinAPIWorker(key string) IFleetPinIntakeAPI {
+func NewFleetPinAPIWorker(key string, url string, l logger.Logger) FleetPinAPIKey {
 	s := []string{"JWT ", key}
 	jwt := strings.Join(s, "")
-	return fleetPinAPIKey{jwtToken: jwt}
+	return FleetPinAPIKey{JwtToken: jwt, UrlString: url, logger: l}
 }
 
 // GetAssetsHttpRequest /** Makes an HTTP intakeRequest for FleetPin's assets. **/
-func (fpak fleetPinAPIKey) GetAssetsHttpRequest(client *http.Client) (*http.Response, error) {
-	req, err := http.NewRequest("GET", "https://app.fleetpin.co.nz/api/assets", nil)
+func (fpak FleetPinAPIKey) GetAssetsHttpRequest(client *http.Client) (*http.Response, error) {
+	req, err := http.NewRequest("GET", fpak.UrlString, nil)
 	if err != nil {
+		fpak.logger.Zap.Error("GetAssetHttpRequest New Request failed.", zap.Error(err))
 		return nil, err
 	}
-	req.Header.Add("Authorization", fpak.jwtToken)
+	req.Header.Add("Authorization", fpak.JwtToken)
 	res, err := client.Do(req)
 	if err != nil {
+		fpak.logger.Zap.Error("GetAssetHttpRequest Do Request failed.", zap.Error(err))
 		return nil, err
 	}
+	fpak.logger.Zap.Info("GetAssetsHttpRequests Response", zap.Any("Response", &res))
 	return res, err
 }
 
 // GetAssetByIdHttpRequest /** Makes an HTTP intakeRequest for a specific FleetPin asset. **/
-func (fpak fleetPinAPIKey) GetAssetByIdHttpRequest(client *http.Client, machineId string) (*http.Response, error) {
-	urlParts := []string{"https://app.fleetpin.co.nz/api/assets/", machineId}
+func (fpak FleetPinAPIKey) GetAssetByIdHttpRequest(client *http.Client, machineId string) (*http.Response, error) {
+	urlParts := []string{fpak.UrlString, "/", machineId}
 	urlString := strings.Join(urlParts, "")
 	req, err := http.NewRequest("GET", urlString, nil)
 	if err != nil {
+		fpak.logger.Zap.Error("GetAssetHttpRequest New Request failed. Error: %v", zap.Any("Error", err.Error()))
 		return nil, err
 	}
-	req.Header.Add("Authorization", fpak.jwtToken)
+	req.Header.Add("Authorization", fpak.JwtToken)
 	res, err := client.Do(req)
 	if err != nil {
+		fpak.logger.Zap.Error("GetAssetHttpRequest Do Request failed.", zap.Any("Error", err.Error()))
 		return nil, err
 	}
 	return res, err

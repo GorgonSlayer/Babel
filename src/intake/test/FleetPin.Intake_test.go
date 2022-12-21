@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"radiola.co.nz/babel/src/intake"
+	"radiola.co.nz/babel/src/util/logger"
 	"strings"
 	"testing"
 )
@@ -32,7 +33,8 @@ func TestGetAssetsHttpRequestFailure(t *testing.T) {
 			}, nil
 		}),
 	}
-	fpw := intake.NewFleetPinAPIWorker("blahblahblah") //Using the real HTTP request here. This could fail for unrelated reasons.
+	logger := logger.NewLogger(false, "test.log")
+	fpw := intake.NewFleetPinAPIWorker("blahblahblah", "lalalalala.co.nz", logger) //Using the real HTTP request here. This could fail for unrelated reasons.
 	res, err := fpw.GetAssetsHttpRequest(client)
 	if err != nil {
 		t.Logf(" \n Error: \n")
@@ -56,7 +58,8 @@ func TestGetAssetsHttpRequestSuccess(t *testing.T) {
 			}, nil
 		}),
 	}
-	fpw := intake.NewFleetPinAPIWorker("blahblahblah") //Don't put the Key in here. Mock this.
+	logger := logger.NewLogger(false, "test.log")
+	fpw := intake.NewFleetPinAPIWorker("blahblahblah", "lalalalala.co.nz", logger) //Don't put the Key in here. Mock this.
 	res, err := fpw.GetAssetsHttpRequest(client)
 	if err != nil {
 		t.Fatalf("Something went wrong during the HTTP request for successful GetAssets Request \n %v \n %v", err, err.Error())
@@ -78,7 +81,8 @@ func TestGetAssetByIdHttpRequestUnAuthorisedFailure(t *testing.T) {
 			}, nil
 		}),
 	}
-	fpw := intake.NewFleetPinAPIWorker("blahblahblah") //Using the real HTTP request here. This could fail for unrelated reasons.
+	logger := logger.NewLogger(false, "test.log")
+	fpw := intake.NewFleetPinAPIWorker("blahblahblah", "lalalalala.co.nz", logger) //Using the real HTTP request here. This could fail for unrelated reasons.
 	res, err := fpw.GetAssetByIdHttpRequest(client, "")
 	if err != nil {
 		t.Logf(" \n Error: \n")
@@ -103,7 +107,8 @@ func TestGetAssetByIdHttpRequestIncorrectMachineIdFailure(t *testing.T) {
 			}, nil
 		}),
 	}
-	fpw := intake.NewFleetPinAPIWorker("blahblahblah") //Using the real HTTP request here. This could fail for unrelated reasons.
+	logger := logger.NewLogger(false, "test.log")
+	fpw := intake.NewFleetPinAPIWorker("blahblahblah", "lalalalala.co.nz", logger) //Using the real HTTP request here. This could fail for unrelated reasons.
 	res, err := fpw.GetAssetByIdHttpRequest(client, "123456789")
 	if err != nil {
 		t.Logf(" \n Error: \n")
@@ -127,7 +132,8 @@ func TestGetAssetByIdHttpRequestSuccess(t *testing.T) {
 			}, nil
 		}),
 	}
-	fpw := intake.NewFleetPinAPIWorker("blahblahblah") //Using the real HTTP request here. This could fail for unrelated reasons.
+	logger := logger.NewLogger(false, "test.log")
+	fpw := intake.NewFleetPinAPIWorker("blahblahblah", "lalalalala.co.nz", logger) //Using the real HTTP request here. This could fail for unrelated reasons.
 	res, err := fpw.GetAssetByIdHttpRequest(client, "123456789")
 	if err != nil {
 		t.Logf(" \n Error: \n")

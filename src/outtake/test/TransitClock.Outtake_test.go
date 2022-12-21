@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"radiola.co.nz/babel/src/model/outtakeRequest"
 	"radiola.co.nz/babel/src/outtake"
+	"radiola.co.nz/babel/src/util/logger"
 	"strconv"
 	"strings"
 	"testing"
@@ -27,7 +28,8 @@ func (fn RoundTripperFunc) RoundTrip(r *http.Request) (*http.Response, error) {
 
 /** Successfully testing Generate TransitClock request. **/
 func TestGenerateTransitClockRequestSuccess(t *testing.T) {
-	tco := outtake.NewTransitClockOuttake(host, port, key, agency)
+	logger := logger.NewLogger(false, "test.log")
+	tco := outtake.NewTransitClockOuttake(host, port, key, agency, logger)
 	req, err := tco.GenerateTransitClockRequest()
 	if err != nil {
 		t.Errorf("Something has gone wrong in GenerateTransitClockRequest() \n %v \n", err)
@@ -43,7 +45,8 @@ func TestGenerateTransitClockRequestSuccess(t *testing.T) {
 
 /** Generate an invalid TransitClock request. **/
 func TestGenerateURLParams(t *testing.T) {
-	tco := outtake.NewTransitClockOuttake(host, port, key, agency)
+	logger := logger.NewLogger(false, "test.log")
+	tco := outtake.NewTransitClockOuttake(host, port, key, agency, logger)
 	req, err := tco.GenerateTransitClockRequest()
 	if err != nil {
 		t.Errorf("Something has gone wrong in GenerateTransitClockRequest() \n %v \n", err)
@@ -80,7 +83,8 @@ func TestFlushDataToTransitClock(t *testing.T) {
 			}, nil
 		}),
 	}
-	tco := outtake.NewTransitClockOuttake(host, port, key, agency)
+	logger := logger.NewLogger(false, "test.log")
+	tco := outtake.NewTransitClockOuttake(host, port, key, agency, logger)
 	req, err := tco.GenerateTransitClockRequest()
 	if err != nil {
 		t.Errorf("Something has gone wrong in GenerateTransitClockRequest() \n %v \n", err)

@@ -2,8 +2,10 @@ package outtake
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"net/http"
 	"radiola.co.nz/babel/src/model/outtakeRequest"
+	"radiola.co.nz/babel/src/util/logger"
 	"strings"
 )
 
@@ -26,15 +28,17 @@ type TransitClockOuttake struct {
 	TransitClockPort   int
 	TransitClockKey    string
 	TransitClockAgency string
+	logger             logger.Logger
 }
 
 // NewTransitClockOuttake /** Constructor for this Outtake. **/
-func NewTransitClockOuttake(host string, port int, key string, agency string) ITransitClockOuttake {
+func NewTransitClockOuttake(host string, port int, key string, agency string, l logger.Logger) TransitClockOuttake {
 	return TransitClockOuttake{
 		TransitClockHost:   host,
 		TransitClockPort:   port,
 		TransitClockKey:    key,
 		TransitClockAgency: agency,
+		logger:             l,
 	}
 }
 
@@ -42,9 +46,9 @@ func NewTransitClockOuttake(host string, port int, key string, agency string) IT
 func (tco TransitClockOuttake) GenerateTransitClockRequest() (*http.Request, error) {
 	s := []string{"https://", tco.TransitClockHost, "/api/v1/key/", tco.TransitClockKey, "/agency/", tco.TransitClockAgency, "/command/pushAvl"}
 	compositeUrl := strings.Join(s, "")
-	//fmt.Printf("\n URL: \n %s \n", compositeUrl, nil)
 	req, err := http.NewRequest("GET", compositeUrl, nil)
 	if err != nil {
+		tco.logger.Zap.Error("GenerateTransitClockRequest ", zap.Any("Error", err.Error()))
 		return nil, err
 	}
 	return req, err
@@ -61,13 +65,16 @@ func (tco TransitClockOuttake) GenerateURLParams(req *http.Request, tce outtakeR
 	q.Add("h", fmt.Sprintf("%d", tce.Heading))
 	q.Add("door", fmt.Sprintf("%d", tce.Door))
 	q.Add("driverId", tce.DriverId)
+	tco.logger.Zap.Info("GenerateURLParams Raw Query", zap.Any("RawQuery", &q))
 	req.URL.RawQuery = q.Encode() //We need to encode the values back onto the request.
-	//fmt.Printf(" \n %v \n ", req.URL.RawQuery)
 }
 
 // FlushDataToTransitClock /** Pushes our data using a client Transit Clock instance. **/
 func (tco TransitClockOuttake) FlushDataToTransitClock(client *http.Client, req *http.Request) (*http.Response, error) {
-	//fmt.Printf("\n URL: %s \n", req.URL.String())
 	res, err := client.Do(req)
+	if err != nil {
+		tco.logger.Zap.Error("FlushDataToTransitClock", zap.Any("Error", err.Error()))
+		return nil, err
+	}
 	return res, err
 }
