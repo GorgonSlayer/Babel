@@ -52,7 +52,6 @@ func (o Overseer) Length() int {
 
 // Push /** Pushes an item onto the Heap. **/
 func (o Overseer) Push(item *util.Item) {
-	item.Priority = item.Priority + item.Worker.RefreshRate()
 	heap.Push(o.queue, item)
 	o.logger.Zap.Info("Pushed item onto Priority Queue", zap.Any("item", item))
 }
@@ -67,7 +66,7 @@ func (o Overseer) Pop() *util.Item {
 // Peek /** Peek the top item on the Heap. **/
 func (o Overseer) Peek() *util.Item {
 	item := o.queue.Peek()
-	o.logger.Zap.Info("Peeked Item on Priority Queue", zap.Any("item", item))
+	//o.logger.Zap.Info("Peeked Item on Priority Queue", zap.Any("item", item))
 	return item
 }
 

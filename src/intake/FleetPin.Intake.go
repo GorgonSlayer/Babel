@@ -3,6 +3,7 @@ package intake
 import (
 	"go.uber.org/zap"
 	"net/http"
+	"net/http/httputil"
 	"radiola.co.nz/babel/src/util/logger"
 	"strings"
 )
@@ -40,12 +41,14 @@ func (fpak FleetPinAPIKey) GetAssetsHttpRequest(client *http.Client) (*http.Resp
 		return nil, err
 	}
 	req.Header.Add("Authorization", fpak.JwtToken)
+	dump, err := httputil.DumpRequestOut(req, true)
+	fpak.logger.Zap.Debug("Request", zap.Any("req", string(dump)))
 	res, err := client.Do(req)
 	if err != nil {
 		fpak.logger.Zap.Error("GetAssetHttpRequest Do Request failed.", zap.Error(err))
 		return nil, err
 	}
-	fpak.logger.Zap.Info("GetAssetsHttpRequests Response", zap.Any("Response", &res))
+	fpak.logger.Zap.Debug("GetAssetsHttpRequests Response", zap.Any("Response Header", res.Header), zap.Any("Response Body", res.Body))
 	return res, err
 }
 
@@ -59,10 +62,13 @@ func (fpak FleetPinAPIKey) GetAssetByIdHttpRequest(client *http.Client, machineI
 		return nil, err
 	}
 	req.Header.Add("Authorization", fpak.JwtToken)
+	dump, err := httputil.DumpRequestOut(req, true)
+	fpak.logger.Zap.Debug("Request", zap.Any("req", string(dump)))
 	res, err := client.Do(req)
 	if err != nil {
 		fpak.logger.Zap.Error("GetAssetHttpRequest Do Request failed.", zap.Any("Error", err.Error()))
 		return nil, err
 	}
+	fpak.logger.Zap.Debug("GetAssetsHttpRequests Response", zap.Any("Response Header", res.Header), zap.Any("Response Body", res.Body))
 	return res, err
 }

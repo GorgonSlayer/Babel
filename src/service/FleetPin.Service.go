@@ -31,15 +31,25 @@ func (fps FleetPinService) FleetPinAssetConstructor(res *http.Response) ([]intak
 	var assets []intake.FleetPinAsset
 	if res.StatusCode == http.StatusOK {
 		decoder := json.NewDecoder(res.Body)
+		t, err := decoder.Token()
+		if err != nil {
+
+		}
+		fps.logger.Zap.Error("Opening Bracket", zap.Any("Opening Bracket", t))
 		for decoder.More() { //Iterate over the decoding json.
 			var asset intake.FleetPinAsset
 			err := decoder.Decode(&asset)
 			if err != nil {
 				fps.logger.Zap.Error("An Error occurred during FleetPinAssetConstructor JSON decoding", zap.Error(err))
 			}
-			fps.logger.Zap.Info("FleetPinAssetConstructor", zap.Any("FleetPinAsset", &asset)) //The individual asset.
+			fps.logger.Zap.Debug("FleetPinAssetConstructor", zap.Any("FleetPinAsset", &asset)) //The individual asset.
 			assets = append(assets, asset)
 		}
+		t, err = decoder.Token()
+		if err != nil {
+
+		}
+		fps.logger.Zap.Error("Closing Bracket", zap.Any("Closing Bracket", t))
 		return assets, nil
 	}
 	return assets, errors.New("intake response received has status code other than 200")
@@ -58,7 +68,7 @@ func (fps FleetPinService) FleetPinAssetToTransitClockFormatConverter(fpa []inta
 		tce.Speed = float64(v.Position.Speed) //Fleetpin gives us an integer for speed, but Transit Clock takes a float.
 		tce.Door = 0                          //Fleetpin doesn't provide us with anything like that.
 		tce.DriverId = ""                     //Fleetpin seems to have no matching for Driver ID via the API at the moment.
-		fps.logger.Zap.Info("FleetPinAssetToTransitClockFormatConverter", zap.Any("TransitClockEvent", &tce))
+		fps.logger.Zap.Debug("FleetPinAssetToTransitClockFormatConverter", zap.Any("TransitClockEvent", &tce))
 		tceArray = append(tceArray, tce)
 	}
 	return tceArray
