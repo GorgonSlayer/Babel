@@ -3,8 +3,10 @@ package service
 import (
 	"encoding/json"
 	"errors"
-	"go.uber.org/zap"
 	"net/http"
+	"time"
+
+	"go.uber.org/zap"
 	intake "radiola.co.nz/babel/src/model/intakeResponse"
 	outtake "radiola.co.nz/babel/src/model/outtakeRequest"
 	"radiola.co.nz/babel/src/util/logger"
@@ -33,9 +35,9 @@ func (fps FleetPinService) FleetPinAssetConstructor(res *http.Response) ([]intak
 		decoder := json.NewDecoder(res.Body)
 		t, err := decoder.Token()
 		if err != nil {
-
+			fps.logger.Zap.Error("Error during Opening  Bracket of Decode", zap.Any("Error", err))
 		}
-		fps.logger.Zap.Error("Opening Bracket", zap.Any("Opening Bracket", t))
+		fps.logger.Zap.Debug("Opening Bracket", zap.Any("Opening Bracket", t))
 		for decoder.More() { //Iterate over the decoding json.
 			var asset intake.FleetPinAsset
 			err := decoder.Decode(&asset)
@@ -47,9 +49,9 @@ func (fps FleetPinService) FleetPinAssetConstructor(res *http.Response) ([]intak
 		}
 		t, err = decoder.Token()
 		if err != nil {
-
+			fps.logger.Zap.Error("Error during Closing  Bracket of Decode", zap.Any("Error", err))
 		}
-		fps.logger.Zap.Error("Closing Bracket", zap.Any("Closing Bracket", t))
+		fps.logger.Zap.Debug("Closing Bracket", zap.Any("Closing Bracket", t))
 		return assets, nil
 	}
 	return assets, errors.New("intake response received has status code other than 200")
@@ -61,7 +63,7 @@ func (fps FleetPinService) FleetPinAssetToTransitClockFormatConverter(fpa []inta
 	for _, v := range fpa { //We loop over however many we have.
 		var tce outtake.TransitClockEvent
 		tce.VehicleId = v.Name
-		tce.Time = v.Position.DeviceTime.Unix() //We take Fleetpin's time as a time.Time object, but Transit Clock takes it as a Unix Epoch Int.
+		tce.Time = time.Now().UnixMilli() //We take Fleetpin's time as a time.Time object, but Transit Clock takes it as a Unix Epoch Int.
 		tce.Lat = v.Position.Lat
 		tce.Lon = v.Position.Long
 		tce.Heading = v.Position.Heading

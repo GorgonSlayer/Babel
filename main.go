@@ -1,12 +1,13 @@
 package main
 
 import (
+	"time"
+
 	"radiola.co.nz/babel/src/config"
 	"radiola.co.nz/babel/src/overseer"
 	"radiola.co.nz/babel/src/util"
 	"radiola.co.nz/babel/src/util/logger"
 	"radiola.co.nz/babel/src/worker"
-	"time"
 )
 
 /** This function should initialise the application and ensure the overseer loop kicks off. **/

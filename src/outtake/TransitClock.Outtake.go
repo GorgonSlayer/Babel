@@ -2,11 +2,12 @@ package outtake
 
 import (
 	"fmt"
-	"go.uber.org/zap"
 	"net/http"
+	"strings"
+
+	"go.uber.org/zap"
 	"radiola.co.nz/babel/src/model/outtakeRequest"
 	"radiola.co.nz/babel/src/util/logger"
-	"strings"
 )
 
 /**
@@ -51,6 +52,7 @@ func (tco TransitClockOuttake) GenerateTransitClockRequest() (*http.Request, err
 		tco.logger.Zap.Error("GenerateTransitClockRequest ", zap.Any("Error", err.Error()))
 		return nil, err
 	}
+	tco.logger.Zap.Info("Request Dump", zap.Any("URL Host", req.URL.Host), zap.Any("URL Path", req.URL.Path))
 	return req, err
 }
 
@@ -65,8 +67,8 @@ func (tco TransitClockOuttake) GenerateURLParams(req *http.Request, tce outtakeR
 	q.Add("h", fmt.Sprintf("%d", tce.Heading))
 	q.Add("door", fmt.Sprintf("%d", tce.Door))
 	q.Add("driverId", tce.DriverId)
-	tco.logger.Zap.Info("GenerateURLParams Raw Query", zap.Any("RawQuery", &q))
 	req.URL.RawQuery = q.Encode() //We need to encode the values back onto the request.
+	tco.logger.Zap.Info("GenerateURLParams Raw Query", zap.Any("Query", req.URL.RawQuery))
 }
 
 // FlushDataToTransitClock /** Pushes our data using a client Transit Clock instance. **/
@@ -76,5 +78,6 @@ func (tco TransitClockOuttake) FlushDataToTransitClock(client *http.Client, req 
 		tco.logger.Zap.Error("FlushDataToTransitClock", zap.Any("Error", err.Error()))
 		return nil, err
 	}
+	tco.logger.Zap.Info("Response", zap.Any("Response Status Code", res.StatusCode), zap.Any("Response Header", res.Header), zap.Any("Response Body", res.Body))
 	return res, err
 }
