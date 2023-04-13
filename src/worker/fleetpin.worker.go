@@ -2,6 +2,7 @@ package worker
 
 import (
 	"net/http"
+
 	"radiola.co.nz/babel/src/intake"
 	"radiola.co.nz/babel/src/model/outtakeRequest"
 	"radiola.co.nz/babel/src/outtake"
@@ -10,9 +11,9 @@ import (
 )
 
 type FleetPinWorker struct {
-	fpk         intake.FleetPinAPIKey
-	fps         service.FleetPinService
-	tco         outtake.TransitClockOuttake
+	fpk         intake.IFleetPinIntakeAPI
+	fps         service.IFleetPinService
+	tco         outtake.ITransitClockOuttake
 	refreshRate int64
 }
 

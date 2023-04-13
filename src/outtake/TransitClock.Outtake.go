@@ -33,7 +33,7 @@ type TransitClockOuttake struct {
 }
 
 // NewTransitClockOuttake /** Constructor for this Outtake. **/
-func NewTransitClockOuttake(host string, port int, key string, agency string, l logger.Logger) TransitClockOuttake {
+func NewTransitClockOuttake(host string, port int, key string, agency string, l logger.Logger) ITransitClockOuttake {
 	return TransitClockOuttake{
 		TransitClockHost:   host,
 		TransitClockPort:   port,

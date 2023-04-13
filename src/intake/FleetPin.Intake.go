@@ -1,11 +1,11 @@
 package intake
 
 import (
-	"go.uber.org/zap"
 	"net/http"
-	"net/http/httputil"
-	"radiola.co.nz/babel/src/util/logger"
 	"strings"
+
+	"go.uber.org/zap"
+	"radiola.co.nz/babel/src/util/logger"
 )
 
 /**
@@ -27,7 +27,7 @@ type FleetPinAPIKey struct {
 }
 
 // NewFleetPinAPIWorker /** Generates our JWT token, needs to be formatted as "JWT /apikey/" **/
-func NewFleetPinAPIWorker(key string, url string, l logger.Logger) FleetPinAPIKey {
+func NewFleetPinAPIWorker(key string, url string, l logger.Logger) IFleetPinIntakeAPI {
 	s := []string{"JWT ", key}
 	jwt := strings.Join(s, "")
 	return FleetPinAPIKey{JwtToken: jwt, UrlString: url, logger: l}
@@ -41,8 +41,6 @@ func (fpak FleetPinAPIKey) GetAssetsHttpRequest(client *http.Client) (*http.Resp
 		return nil, err
 	}
 	req.Header.Add("Authorization", fpak.JwtToken)
-	dump, err := httputil.DumpRequestOut(req, true)
-	fpak.logger.Zap.Debug("Request", zap.Any("req", string(dump)))
 	res, err := client.Do(req)
 	if err != nil {
 		fpak.logger.Zap.Error("GetAssetHttpRequest Do Request failed.", zap.Error(err))
@@ -62,8 +60,6 @@ func (fpak FleetPinAPIKey) GetAssetByIdHttpRequest(client *http.Client, machineI
 		return nil, err
 	}
 	req.Header.Add("Authorization", fpak.JwtToken)
-	dump, err := httputil.DumpRequestOut(req, true)
-	fpak.logger.Zap.Debug("Request", zap.Any("req", string(dump)))
 	res, err := client.Do(req)
 	if err != nil {
 		fpak.logger.Zap.Error("GetAssetHttpRequest Do Request failed.", zap.Any("Error", err.Error()))

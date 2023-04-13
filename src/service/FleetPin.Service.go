@@ -15,7 +15,7 @@ import (
 // IFleetPinService /** FleetPin Service interface to allow others to access **/
 type IFleetPinService interface {
 	FleetPinAssetConstructor(res *http.Response) ([]intake.FleetPinAsset, error)
-	FleetPinAssetToTransitClockFormatConverter(fpa []intake.FleetPinAsset) outtake.TransitClockEvent
+	FleetPinAssetToTransitClockFormatConverter(fpa []intake.FleetPinAsset) []outtake.TransitClockEvent
 }
 
 // FleetPinService /** This struct should store any state needed to process these FleetPin JSONs into useable structs. **/
@@ -24,7 +24,7 @@ type FleetPinService struct {
 }
 
 // NewFleetPinService /** Constructor we use for importing this service. **/
-func NewFleetPinService(l logger.Logger) FleetPinService {
+func NewFleetPinService(l logger.Logger) IFleetPinService {
 	return FleetPinService{logger: l}
 }
 
@@ -54,7 +54,7 @@ func (fps FleetPinService) FleetPinAssetConstructor(res *http.Response) ([]intak
 		fps.logger.Zap.Debug("Closing Bracket", zap.Any("Closing Bracket", t))
 		return assets, nil
 	}
-	return assets, errors.New("intake response received has status code other than 200")
+	return assets, errors.New("FleetPinAssetConstructor has received status code other than 200")
 }
 
 // FleetPinAssetToTransitClockFormatConverter /** This function converts the FleetPinAsset struct into a transit clock friendly format. **/

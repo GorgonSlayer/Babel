@@ -26,8 +26,10 @@ func initialise(logName string) {
 }
 
 /** Main loop for this application**/
+/**
 func main() {
 	//l := logger.NewLogger(false, "output.log")
 	initialise("output.log")
 	//newMain(l)
 }
+**/
