@@ -13,7 +13,7 @@ func ERoadLoop() {
 	client := http.Client{}
 	l := logger.NewLogger(false, "eroad.log")
 	eri := intake.NewERoadAPI(
-		"7iVmycdLP3GuvdQn1yOS0bC8f7vTrGpj",
+		"InsertYourKeysHere",
 		"https://api.eroad.co.nz",
 		l,
 	)
